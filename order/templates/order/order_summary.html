@@ -1,0 +1,70 @@
+{% extends "order/base.html" %}
+
+
+{% block content %}
+
+  <!--Main layout-->
+  <main>
+    <div class="container dark-grey-text mt-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+
+        <!--Grid column-->
+
+            <div class="table-responsive">
+
+              <!--Table-->
+              <table class="table">
+
+                <!--Table head-->
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th class="th-lg">Title</th>
+                    <th class="th-lg">Price</th>
+                    <th class="th-lg">Quantity</th>
+                    <th class="th-lg">Cost</th>
+                  </tr>
+                </thead>
+                <!--Table head-->
+
+                <!--Table body-->
+                <tbody>
+                {% for order_item in order.orderitem_set.all %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ order_item.item.title }}</td>
+                    <td>{{ order_item.item.price }}</td>
+                    <td><a href="{{ order_item.item.get_remove_from_cart_url }}"><i class="fas fa-minus"></i> {{ order_item.quantity }} <a href="{{ order_item.item.get_add_to_cart_url }}"><i class="fas fa-plus"></i></a></td>
+                    <td>{{ order_item.get_cost }}</td>
+                    <td><a href="{{ order_item.item.get_delete_from_summary_url }}"><i class="fas fa-trash"></i></a></td>
+                  </tr>
+                {% endfor %}
+                  <tr>
+                    <th scope="row"></th>
+                    <td></td>
+                    <td></td>
+                    <td><b>Total Price</b></td>
+                    <td><b>{{ order.get_total_price }}</b></td>
+                  </tr>
+                </tbody>
+                <!--Table body-->
+
+              </table>
+  <!--Table-->
+<a href="{% url 'check-out' %}" class="btn btn-primary float-right">Proceed to checkout</a>
+</div>
+
+        <!--Grid column-->
+    </div>
+
+  </main>
+  <!--Main layout-->
+{% endblock content %}
