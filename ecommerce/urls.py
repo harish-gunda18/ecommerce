@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('order.urls')),
+    path('paypal/', include('paypal.standard.ipn.urls')),
 ]
