@@ -5,6 +5,18 @@
 {% block head_title %}{% trans "Sign Out" %}{% endblock %}
 
 {% block content %}
+<main class="pt-4">
+    <div class="container dark-grey-text mt-5">
+      {% if messages %}
+          {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                  {{ message }}
+              </div>
+          {% endfor %}
+      {% endif %}
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        <div class="col-md-5 offset-md-4 mb-4">
 <h1>{% trans "Sign Out" %}</h1>
 
 <p>{% trans 'Are you sure you want to sign out?' %}</p>
@@ -14,8 +26,11 @@
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
   {% endif %}
-  <button type="submit">{% trans 'Sign Out' %}</button>
+  <button class="btn btn-danger" type="submit">{% trans 'Sign Out' %}</button>
 </form>
 
-
+        </div>
+      </div>
+    </div>
+</main>
 {% endblock %}
