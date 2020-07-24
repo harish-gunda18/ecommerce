@@ -1,3 +1,0 @@
-*.py linguist-detectable
-*.js -linguist-detectable
-order/templates/order/*.css -linguist-detectable
