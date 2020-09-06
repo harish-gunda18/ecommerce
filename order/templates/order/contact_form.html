@@ -1,0 +1,32 @@
+{% extends "order/base.html" %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+  <!--Main layout-->
+  <main>
+    <div class="container">
+      {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="">
+                <legend class="border-bottom mb-4">Contact Us</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+              <button class="btn btn-outline-info" type="submit">Send Email</button>
+            </div>
+        </form>
+
+
+    </div>
+  </main>
+  <!--Main layout-->
+{% endblock content %}
+
