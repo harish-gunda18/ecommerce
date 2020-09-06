@@ -1,10 +1,13 @@
 from django.urls import path, include
 from .views import ItemListView, ItemDetailView, add_to_cart, remove_from_cart, order_summary, delete_from_summary, \
-    checkout, add_new_address, select_from_saved_addresses, payment_process, payment_done, payment_canceled
+    checkout, add_new_address, select_from_saved_addresses, payment_process, payment_done, payment_canceled, \
+    PortfolioCreateView, ProductCreateView, PortfolioListView, PortfolioDetailView, contact_us_view
 
 urlpatterns = [
     path('', ItemListView.as_view(), name='item-list'),
+    path('portfolios/', PortfolioListView.as_view(), name='portfolio-list'),
     path('product/<slug:slug>', ItemDetailView.as_view(), name='item-detail'),
+    path('portfolio/<int:pk>', PortfolioDetailView.as_view(), name='portfolio-detail'),
     path('add-to-cart/<slug:slug>', add_to_cart, name='add-to-cart'),
     path('remove-from-cart/<slug:slug>', remove_from_cart, name='remove-from-cart'),
     path('delete-from-summary/<slug:slug>', delete_from_summary, name='delete-from-summary'),
@@ -15,4 +18,7 @@ urlpatterns = [
     path('process-payment/<int:order_id>', payment_process, name='process_payment'),
     path('payment-done/', payment_done, name='payment_done'),
     path('payment-cancelled/', payment_canceled, name='payment_cancelled'),
+    path('add-portfolio/', PortfolioCreateView.as_view(), name='add-portfolio'),
+    path('add-product/', ProductCreateView.as_view(), name='add-product'),
+    path('contact-form/', contact_us_view, name='contact-form'),
 ]
