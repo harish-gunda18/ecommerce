@@ -15,6 +15,7 @@ class Item(models.Model):
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=2, default='S')
     label = models.CharField(choices=LABEL_CHOICES, max_length=1, default='P')
     slug = models.SlugField()
+    vendor = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -72,5 +73,26 @@ class OrderItem(models.Model):
     def get_cost(self):
         return self.item.price * self.quantity
 
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=10)
+    expiry_date = models.DateTimeField(blank=True, null=True)
+    discount = models.IntegerField()
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_vendor = models.BooleanField(default=False)
+
+
+class Portfolio(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    about = models.TextField()
+    email = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=15)
+    picture = models.ImageField()
+
+    def get_absolute_url(self):
+        return reverse('portfolio-detail', kwargs={'pk': self.pk})
 
 
