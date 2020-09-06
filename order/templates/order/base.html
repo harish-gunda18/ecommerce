@@ -55,7 +55,7 @@
 
       <!-- Brand -->
       <a class="navbar-brand waves-effect" href="/">
-        <strong class="blue-text">Django E-commerce</strong>
+        <strong class="blue-text">Kappagantu</strong>
       </a>
 
       <!-- Collapse -->
@@ -75,12 +75,30 @@
         <!-- Right -->
         <ul class="navbar-nav nav-flex-icons">
             {% if user.is_authenticated %}
+          {% if user.profile.is_vendor %}
+          <li class="nav-item">
+              <a href="{% url 'add-portfolio' %}" class="nav-link waves-effect">
+                <span class="badge red z-depth-1 mr-1"></span>
+                <i class="fas fa-address-card"></i>
+                <span class="clearfix d-none d-sm-inline-block"> Add portfolio </span>
+              </a>
+          </li>
+            <li class="nav-item">
+              <a href="{% url 'add-product' %}" class="nav-link waves-effect">
+                <span class="badge red z-depth-1 mr-1"></span>
+                <i class="fas fa-cube"></i>
+                <span class="clearfix d-none d-sm-inline-block"> Add Product </span>
+              </a>
+            </li>
+            {% else %}
           <li class="nav-item">
             <a href="{% url 'order-summary' %}" class="nav-link waves-effect">
               <span class="badge red z-depth-1 mr-1"> {{ user|cart_items_number }} </span>
               <i class="fas fa-shopping-cart"></i>
               <span class="clearfix d-none d-sm-inline-block"> Cart </span>
             </a>
+          </li>
+            {% endif %}
               <li class="nav-item">
                 <a href="{% url 'account_logout' %}" class="nav-link waves-effect">
                   <span class="clearfix d-none d-sm-inline-block"> Logout </span>
