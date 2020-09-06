@@ -1,13 +1,18 @@
 from django.shortcuts import get_object_or_404, render, HttpResponseRedirect, redirect, reverse
 from django.views.generic import ListView, DetailView
-from .models import Item, OrderItem, Order, BillingAddress
+from .models import Item, OrderItem, Order, BillingAddress, Portfolio
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import BillingAddressForm
+from .forms import BillingAddressForm, CouponForm, ContactForm
 from django.conf import settings
 from paypal.standard.forms import PayPalPaymentsForm
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 class ItemListView(ListView):
@@ -16,9 +21,21 @@ class ItemListView(ListView):
     context_object_name = 'items'
 
 
+class PortfolioListView(ListView):
+    model = Portfolio
+    template_name = 'order/portfolio-page.html'
+    context_object_name = 'items'
+
+
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'order/product-page.html'
+    context_object_name = 'item'
+
+
+class PortfolioDetailView(DetailView):
+    model = Portfolio
+    template_name = 'order/portfolio-detail-page.html'
     context_object_name = 'item'
 
 
@@ -105,6 +122,11 @@ def delete_from_summary(request, slug):
 
 @login_required
 def checkout(request):
+    if request.method == 'POST':
+        form = CouponForm(data=request.POST)
+        if form.is_valid():
+
+            form.save()
     context = {}
     order_qs = Order.objects.filter(user=request.user).filter(ordered=False)
     order = order_qs.first()
@@ -187,3 +209,66 @@ def payment_done(request):
 @csrf_exempt
 def payment_canceled(request):
     return render(request, 'order/payment_cancelled.html')
+
+
+class PortfolioCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Portfolio
+    fields = ['about', 'email', 'phone_number', 'picture']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        if self.request.user.profile.is_vendor:
+            return True
+        return False
+
+
+class ProductCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Item
+    fields = ['title', 'description', 'price']
+
+    def form_valid(self, form):
+        form.instance.vendor = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        if self.request.user.profile.is_vendor:
+            return True
+        return False
+
+
+def contact_us_view(request):
+    if request.method == 'POST':
+        contact_form = ContactForm(data=request.POST)
+        if contact_form.is_valid():
+            print(contact_form.cleaned_data)
+            mail_content = "Hello, This is a simple mail. There is only text, " \
+                           "no attachments are there The mail is sent using Python SMTP library. Thank You"
+            # The mail addresses and password
+            sender_address = 'harish.gunda16@gmail.com'
+            sender_pass = 'baqtfqchkuxzviwo'
+            receiver_address = 'harish.gunda16@gmail.com'
+            # Setup the MIME
+            message = MIMEMultipart()
+            message['From'] = sender_address
+            message['To'] = receiver_address
+            message['Subject'] = 'A test mail sent by Python. It has an attachment.'   # The subject line
+            # The body and the attachments for the mail
+            message.attach(MIMEText(mail_content, 'plain'))
+            # Create SMTP session for sending the mail
+            session = smtplib.SMTP('smtp.gmail.com', 587) # use gmail with port
+            session.starttls() # enable security
+            session.login(sender_address, sender_pass) # login with mail_id and password
+            text = message.as_string()
+            session.sendmail(sender_address, receiver_address, text)
+            session.quit()
+            print('Mail Sent')
+            messages.success(request, 'Your details have been successfully sent to the vendor')
+            render(request, 'order/contact_form.html')
+        else:
+            messages.error(request, contact_form.errors)
+            render(request, 'order/contact_form.html', context={'form': contact_form})
+    contact_form = ContactForm()
+    return render(request, 'order/contact_form.html', context={'form': contact_form})
